@@ -1,0 +1,273 @@
+{{TITULO}}Ficha de equipo{{/TITULO}}
+{{DESC}}Ficha de equipo en Filmify: qué incluye exactamente, disponibilidad real, quién lo presta y cuánto cuesta con todo desglosado.{{/DESC}}
+
+<main id="contenido" class="page-top">
+  <div class="wrap">
+    <nav class="migas" aria-label="Migas de pan">
+      <a href="index.html">Inicio</a>
+      <span aria-hidden="true">/</span>
+      <a href="buscar.html" id="migaCat">Buscar</a>
+      <span aria-hidden="true">/</span>
+      <span id="migaTitulo">Equipo</span>
+    </nav>
+
+    <div class="ficha" id="ficha"><p class="lede">Cargando el equipo…</p></div>
+  </div>
+</main>
+
+{{SCRIPT}}
+(function () {
+  const F = window.FILMIFY, U = window.FilmifyUI;
+  const $ = U.$, $$ = U.$$;
+
+  const eq = F.equipo(U.params.get('id')) || F.EQUIPOS[0];
+  const c  = F.cat(eq.cat);
+  const d  = F.dueno(eq.dueno);
+  const g  = F.GRAD[eq.grad];
+
+  document.title = eq.titulo + ' · Filmify';
+  $('#migaTitulo').textContent = eq.titulo;
+  const mc = $('#migaCat'); mc.textContent = c.name; mc.href = 'buscar.html?cat=' + eq.cat;
+
+  /* ---------------- estado del panel ---------------- */
+  const hoy = new Date();
+  const estado = {
+    desde: null, hasta: null,
+    entrega: eq.entrega[0],
+    cobertura: eq.coberturaMin,
+    mes: hoy.getMonth(), anio: hoy.getFullYear(),
+    calAbierto: false
+  };
+
+  const tick = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.2 4.2L19 7"/></svg>';
+  const cruz = '<svg viewBox="0 0 24 24" stroke-linecap="round" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>';
+
+  const nivelEtiqueta = d.nivel === 'pro'
+    ? '<span class="nivel pro">Pro</span>' : '<span class="nivel">Verificado</span>';
+
+  const tiras = ['Frontal', 'Lateral', 'Serie', 'Maleta'];
+
+  function pintar() {
+    const nDias = estado.desde && estado.hasta ? F.dias(estado.desde, estado.hasta) : 0;
+    const des = nDias ? F.desglose(eq, nDias, estado.entrega, estado.cobertura) : null;
+
+    $('#ficha').innerHTML = `
+      <div>
+        <div class="ficha-hero" style="background:linear-gradient(142deg,${g[0]},${g[1]})">
+          <span class="art" aria-hidden="true"></span>
+          <i style="${U.iconoMask(eq.cat)}" aria-hidden="true"></i>
+          <div class="badges">${(eq.badges || []).map((b, i) =>
+            `<span class="badge${i ? ' badge--ink' : ''}">${b}</span>`).join('')}</div>
+        </div>
+        <div class="ficha-tiras">
+          ${tiras.map((t, i) => `<div class="ficha-tira" style="background:linear-gradient(142deg,${g[i % 2 ? 1 : 0]},${g[1]})">
+            <i style="${U.iconoMask(eq.cat)}" aria-hidden="true"></i><span>${t}</span></div>`).join('')}
+        </div>
+        <p class="small" style="margin-top:10px;font-size:12px;color:var(--ink-soft)">
+          Las fotos las hace el propietario siguiendo la guía de la app. Son las mismas que se usan
+          en el acta de entrega.
+        </p>
+
+        <div class="ficha-cabecera">
+          <span class="prod-cat">${c.name}</span>
+          <h1>${eq.titulo}</h1>
+          <div class="ficha-meta">
+            <span class="pt estrella"><svg viewBox="0 0 24 24"><path d="m12 3.6 2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.6 6.8 19.5 8 13.7 3.6 9.7l5.9-.7Z"/></svg>
+              ${String(eq.nota).replace('.', ',')} · ${eq.resenas} valoraciones</span>
+            <span class="pt"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+              ${eq.ciudad} · ${eq.barrio}</span>
+            <span class="pt">a ${String(eq.km).replace('.', ',')} km de ti</span>
+          </div>
+          <p class="ficha-resumen">${eq.resumen}</p>
+        </div>
+
+        <section class="bloque">
+          <h2>Qué incluye exactamente</h2>
+          <ul class="incluye">${eq.incluye.map(i => `<li>${tick}${i}</li>`).join('')}</ul>
+          ${eq.noIncluye.length ? `<h2 style="font-size:15px;margin:24px 0 12px">No incluye</h2>
+            <ul class="incluye no">${eq.noIncluye.map(i => `<li>${cruz}${i}</li>`).join('')}</ul>` : ''}
+          <div class="aviso aviso--info" style="margin-top:20px">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.2"/></svg>
+            <span>Lo que no está en esta lista no viaja. El inventario se repasa pieza a pieza
+            en el check-in y otra vez en la devolución.</span>
+          </div>
+        </section>
+
+        <section class="bloque">
+          <h2>Quién lo presta</h2>
+          <div class="dueno-card">
+            <span class="av" style="background:${d.av}">${d.ini}</span>
+            <div>
+              <b>${d.nombre}${nivelEtiqueta}</b>
+              <p>${d.nota.toString().replace('.', ',')} de nota · ${d.resenas} alquileres cerrados ·
+                 en Filmify desde ${d.desde} · responde en ${d.responde} h de media</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="bloque">
+          <h2>Entrega y devolución</h2>
+          <div class="opciones">
+            ${eq.entrega.map(k => {
+              const e = F.ENVIOS[k];
+              return `<div class="opcion" style="cursor:default">
+                <span style="width:17px;flex:0 0 auto;margin-top:2px">${tick.replace('<svg', '<svg style="width:17px;height:17px;stroke:var(--teal-d);fill:none;stroke-width:2.2"')}</span>
+                <span><b>${e.nombre}</b><small>${e.plazo}</small></span>
+                <span class="eur">${e.precio ? F.eur(e.precio) : 'Gratis'}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </section>
+
+        <section class="bloque">
+          <h2>Condiciones</h2>
+          <div class="opciones">
+            <div class="opcion" style="cursor:default"><span></span><span>
+              <b>Cancelación ${F.POLITICAS[eq.politica].nombre.toLowerCase()}</b>
+              <small>${F.POLITICAS[eq.politica].texto}</small></span></div>
+            <div class="opcion" style="cursor:default"><span></span><span>
+              <b>Cobertura mínima exigida: ${F.COBERTURAS[eq.coberturaMin].nombre}</b>
+              <small>${F.COBERTURAS[eq.coberturaMin].detalle}</small></span></div>
+            <div class="opcion" style="cursor:default"><span></span><span>
+              <b>Valor de reposición declarado: ${F.eur(eq.valor)}</b>
+              <small>Sobre esta cifra se calcula el depósito que se preautoriza en tu tarjeta.</small></span></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="panel" aria-label="Reservar este equipo">
+        <div class="panel-precio"><b>${F.eur(eq.dia)}</b><span>/ día</span></div>
+        <p class="panel-venta">${eq.venta
+          ? `o <strong>${F.eur(eq.venta)}</strong> comprándolo`
+          : 'Este equipo no está a la venta'}</p>
+
+        <div class="campo">
+          <span class="lbl">Fechas</span>
+          <button class="fechas-btn" type="button" id="btnFechas" aria-expanded="${estado.calAbierto}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.4"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>
+            ${estado.desde && estado.hasta
+              ? `<span>${F.fechaCorta(estado.desde)} — ${F.fechaCorta(estado.hasta)}</span>`
+              : estado.desde
+                ? `<span>${F.fechaCorta(estado.desde)} <span class="ph">— elige la vuelta</span></span>`
+                : '<span class="ph">Elige las fechas</span>'}
+          </button>
+          ${estado.calAbierto ? panelCalendario() : ''}
+        </div>
+
+        <div class="campo">
+          <span class="lbl">Cómo lo recibes</span>
+          <div class="opciones">
+            ${eq.entrega.map(k => {
+              const e = F.ENVIOS[k];
+              return `<label class="opcion">
+                <input type="radio" name="entrega" value="${k}" ${estado.entrega === k ? 'checked' : ''}>
+                <span><b>${e.nombre}</b><small>${e.plazo}</small></span>
+                <span class="eur">${e.precio ? F.eur(e.precio) : 'Gratis'}</span>
+              </label>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="campo">
+          <span class="lbl">Cobertura de daños</span>
+          <div class="opciones">
+            ${Object.keys(F.COBERTURAS).map(k => {
+              const cv = F.COBERTURAS[k];
+              const permitido = niveles.indexOf(k) >= niveles.indexOf(eq.coberturaMin);
+              if (!permitido) return '';
+              return `<label class="opcion">
+                <input type="radio" name="cobertura" value="${k}" ${estado.cobertura === k ? 'checked' : ''}>
+                <span><b>${cv.nombre}</b><small>Hasta ${F.eur(cv.cubre)} · franquicia ${F.eur(cv.franquicia)}</small></span>
+                <span class="eur">${cv.pct ? '+' + Math.round(cv.pct * 100) + ' %' : 'Incluida'}</span>
+              </label>`;
+            }).join('')}
+          </div>
+        </div>
+
+        ${des ? `<div class="desglose">
+          <div class="dline"><span>${F.eur(eq.dia)} × ${des.dias} ${des.dias === 1 ? 'día' : 'días'}</span><span>${F.eur(des.bruto)}</span></div>
+          ${des.descuento ? `<div class="dline desc"><span>Descuento por ${des.dias >= 28 ? 'mes' : des.dias >= 7 ? 'semana' : 'varios días'} (${Math.round(des.pctDescuento * 100)} %)</span><span>-${F.eur(des.descuento)}</span></div>` : ''}
+          ${des.seguro ? `<div class="dline"><span>Cobertura ${F.COBERTURAS[estado.cobertura].nombre}</span><span>${F.eur(des.seguro)}</span></div>` : ''}
+          ${des.envio ? `<div class="dline"><span>${F.ENVIOS[estado.entrega].nombre}</span><span>${F.eur(des.envio)}</span></div>` : ''}
+          <div class="dline"><span>Comisión de servicio</span><span>${F.eur(des.comision)}</span></div>
+          <div class="dline total"><span>Total</span><span>${F.eur(des.total)}</span></div>
+        </div>
+        <div class="dep">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v6c0 4.4 3 8 7 9 4-1 7-4.6 7-9V6z"/><path d="m9 12 2 2 4-4"/></svg>
+          <p>Depósito de <b>${F.eur(des.deposito)}</b>. No se cobra: se bloquea en tu tarjeta y
+             se libera solo 48 h después del check-out.</p>
+        </div>
+        <a class="btn btn--primary btn--lg" style="width:100%;margin-top:16px"
+           href="reservar.html?id=${eq.id}&desde=${estado.desde}&hasta=${estado.hasta}&entrega=${estado.entrega}&cobertura=${estado.cobertura}">
+          Continuar con la reserva
+        </a>
+        <p class="small" style="text-align:center;margin-top:11px;font-size:12px;color:var(--ink-soft)">
+          Todavía no se te cobra nada.
+        </p>`
+        : `<div class="aviso aviso--info" style="margin-top:20px">
+             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.4"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3"/></svg>
+             <span>Elige las fechas y verás el precio completo, sin sorpresas al final.</span>
+           </div>`}
+      </aside>`;
+
+    conectar();
+  }
+
+  const niveles = ['basico', 'plus', 'total'];
+
+  function panelCalendario() {
+    const nombreMes = new Date(estado.anio, estado.mes, 1)
+      .toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+    const esMesActual = estado.mes === hoy.getMonth() && estado.anio === hoy.getFullYear();
+    return `<div class="cal">
+      <div class="cal-top">
+        <button class="cal-nav" type="button" id="calPrev" ${esMesActual ? 'disabled' : ''} aria-label="Mes anterior">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m14 6-6 6 6 6"/></svg></button>
+        <b>${nombreMes}</b>
+        <button class="cal-nav" type="button" id="calNext" aria-label="Mes siguiente">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="m10 6 6 6-6 6"/></svg></button>
+      </div>
+      ${U.calendario(eq, estado.mes, estado.anio, estado)}
+      <div class="cal-pie">
+        <span><i style="background:var(--teal-d)"></i>Elegido</span>
+        <span><i style="background:rgba(0,166,160,.16)"></i>Libre</span>
+        <span><i style="background:rgba(20,17,15,.12)"></i>Ocupado</span>
+      </div>
+    </div>`;
+  }
+
+  function conectar() {
+    $('#btnFechas').addEventListener('click', () => { estado.calAbierto = !estado.calAbierto; pintar(); });
+
+    const prev = $('#calPrev'), next = $('#calNext');
+    if (prev) prev.addEventListener('click', () => {
+      estado.mes--; if (estado.mes < 0) { estado.mes = 11; estado.anio--; } pintar();
+    });
+    if (next) next.addEventListener('click', () => {
+      estado.mes++; if (estado.mes > 11) { estado.mes = 0; estado.anio++; } pintar();
+    });
+
+    $$('.cal-cell[data-fecha]:not([disabled])').forEach(b => b.addEventListener('click', () => {
+      const f = b.dataset.fecha;
+      if (!estado.desde || (estado.desde && estado.hasta)) { estado.desde = f; estado.hasta = null; }
+      else if (f <= estado.desde) { estado.desde = f; }
+      else {
+        // no se puede cruzar un día ocupado
+        const bloq = (eq.bloqueados || []).some(x => x > estado.desde && x < f);
+        if (bloq) { estado.desde = f; estado.hasta = null; }
+        else { estado.hasta = f; estado.calAbierto = false; }
+      }
+      pintar();
+    }));
+
+    $$('input[name=entrega]').forEach(i => i.addEventListener('change', e => {
+      estado.entrega = e.target.value; pintar();
+    }));
+    $$('input[name=cobertura]').forEach(i => i.addEventListener('change', e => {
+      estado.cobertura = e.target.value; pintar();
+    }));
+  }
+
+  pintar();
+})();
+{{/SCRIPT}}
