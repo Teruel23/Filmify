@@ -1,0 +1,46 @@
+<header class="site-header{{HEADER_SOLID}}" id="header">
+  <div class="wrap">
+    <div class="head-row">
+      <a class="brand" href="index.html" aria-label="Filmify, ir al inicio">
+        <img class="logo-neg" src="assets/logo-white.png" alt="Filmify" width="150" height="43">
+        <img class="logo-pos" src="assets/logo-color.png" alt="Filmify" width="150" height="43">
+      </a>
+
+      <form class="head-search" action="buscar.html" method="get" role="search">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+        <input type="search" name="q" placeholder="Cámaras, ópticas, luces, drones…" aria-label="Buscar equipo">
+        <div class="divider" aria-hidden="true"></div>
+        <div class="loc">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          Madrid · 25 km
+        </div>
+        <button class="go" type="submit" aria-label="Buscar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+
+      <div class="head-actions">
+        <a class="icon-btn" href="favoritos.html" aria-label="Favoritos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-9.7A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.9C19.5 15.4 12 20 12 20Z"/></svg>
+          <span class="pip" id="favCount" hidden>0</span>
+        </a>
+        <button class="icon-btn" type="button" aria-label="Mensajes">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a7.5 7.5 0 0 1-10.9 6.7L4 20l1.3-4.2A7.5 7.5 0 1 1 20 12Z"/></svg>
+          <span class="dot" aria-hidden="true"></span>
+        </button>
+        <a class="icon-btn" href="reservas.html" aria-label="Mis reservas">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16V11a6 6 0 1 0-12 0v5l-1.6 2.4h15.2L18 16Z"/><path d="M10 19.5a2 2 0 0 0 4 0"/></svg>
+        </a>
+        <button class="avatar-btn" type="button"><span class="av">MT</span><span>Miguel</span></button>
+        <a class="btn btn--primary head-cta" href="publicar.html">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Subir equipo</span>
+        </a>
+      </div>
+    </div>
+
+    <nav class="cats-bar" aria-label="Categorías">
+      <div class="cats-scroll">{{CHIPS}}</div>
+    </nav>
+  </div>
+</header>
