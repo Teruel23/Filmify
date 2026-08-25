@@ -265,9 +265,9 @@ window.FILMIFY = (function () {
   const RESERVAS = [
     { id: 'RS-4821', equipo: 'fx3-smallrig',  rol: 'alquilo', estado: 'en_curso',  desde: '2026-08-24', hasta: '2026-08-27', entrega: 'mano',    total: 217.10 },
     { id: 'RS-4790', equipo: 'zoom-f6',       rol: 'alquilo', estado: 'confirmada',desde: '2026-09-02', hasta: '2026-09-04', entrega: 'express', total: 121.40 },
-    { id: 'RS-4755', equipo: 'aputure-600d',  rol: 'presto',  estado: 'pendiente', desde: '2026-09-06', hasta: '2026-09-08', entrega: 'punto',   total: 148.00 },
+    { id: 'RS-4755', equipo: 'aputure-600d',  rol: 'presto',  estado: 'pendiente', desde: '2026-09-06', hasta: '2026-09-08', entrega: 'punto',   total: 148.00, otra: 'Nerea C.' },
     { id: 'RS-4702', equipo: 'rs4-pro',       rol: 'alquilo', estado: 'cerrada',   desde: '2026-08-11', hasta: '2026-08-13', entrega: 'mano',    total: 79.50 },
-    { id: 'RS-4688', equipo: 'sigma-art-set', rol: 'presto',  estado: 'incidencia',desde: '2026-08-05', hasta: '2026-08-09', entrega: 'express', total: 262.30 }
+    { id: 'RS-4688', equipo: 'sigma-art-set', rol: 'presto',  estado: 'incidencia',desde: '2026-08-05', hasta: '2026-08-09', entrega: 'express', total: 262.30, otra: 'Pablo S.' }
   ];
 
   const ESTADOS = {
